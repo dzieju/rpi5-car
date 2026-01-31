@@ -7,6 +7,7 @@
   - Testowanie dostępnych urządzeń oraz sterowników audio.
   - Zainstalowanie konfiguracji ALSA i PulseAudio.
 - [ ] Przygotowanie interfejsu wizualnego (GUI):
+  - **Silnik GUI:** Flutter (ze względu na nowoczesny wygląd, skalowalność i możliwość migracji na mini PC).
   - Wygląd jak nowoczesne radio samochodowe.
   - Obsługa:
     - Spotify
