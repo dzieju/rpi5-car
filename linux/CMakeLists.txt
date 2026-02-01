@@ -14,7 +14,8 @@ set(APPLICATION_ID "com.example.rpi5_car_radio")
 cmake_policy(SET CMP0063 NEW)
 
 # Load bundled libraries from the lib/ directory relative to the binary.
-# This will be updated later based on installation type.
+# For bundle installs, this RPATH is used as-is. For system installs,
+# this will be overridden with set_target_properties after determining install paths.
 set(CMAKE_INSTALL_RPATH "$ORIGIN/lib")
 
 # Root filesystem for cross-building.
@@ -101,7 +102,8 @@ endif()
 
 # Determine if we're installing to a system location or creating a bundle.
 # System install uses FHS-compliant paths, bundle install uses a single directory.
-# Normalize paths to ensure reliable comparison
+# Normalize paths to ensure reliable comparison.
+# Using ABSOLUTE (not REALPATH) because paths may not exist yet at configure time.
 get_filename_component(NORMALIZED_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}" ABSOLUTE)
 get_filename_component(NORMALIZED_BUNDLE_DIR "${BUILD_BUNDLE_DIR}" ABSOLUTE)
 
