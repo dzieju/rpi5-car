@@ -14,6 +14,7 @@ set(APPLICATION_ID "com.example.rpi5_car_radio")
 cmake_policy(SET CMP0063 NEW)
 
 # Load bundled libraries from the lib/ directory relative to the binary.
+# This will be updated later based on installation type.
 set(CMAKE_INSTALL_RPATH "$ORIGIN/lib")
 
 # Root filesystem for cross-building.
@@ -98,15 +99,35 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   set(CMAKE_INSTALL_PREFIX "${BUILD_BUNDLE_DIR}" CACHE PATH "..." FORCE)
 endif()
 
-# Start with a clean build bundle directory every time.
-install(CODE "
-  file(REMOVE_RECURSE \"${BUILD_BUNDLE_DIR}/\")
-  " COMPONENT Runtime)
+# Determine if we're installing to a system location or creating a bundle.
+# System install uses FHS-compliant paths, bundle install uses a single directory.
+if(CMAKE_INSTALL_PREFIX STREQUAL BUILD_BUNDLE_DIR)
+  set(IS_BUNDLE_INSTALL TRUE)
+  # Start with a clean build bundle directory every time for bundle installs.
+  install(CODE "
+    file(REMOVE_RECURSE \"${BUILD_BUNDLE_DIR}/\")
+    " COMPONENT Runtime)
+else()
+  set(IS_BUNDLE_INSTALL FALSE)
+endif()
 
-set(INSTALL_BUNDLE_DATA_DIR "${CMAKE_INSTALL_PREFIX}/data")
-set(INSTALL_BUNDLE_LIB_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+# Set installation paths based on install type
+if(IS_BUNDLE_INSTALL)
+  # Bundle install: everything in one directory for portability
+  set(INSTALL_BUNDLE_DATA_DIR "${CMAKE_INSTALL_PREFIX}/data")
+  set(INSTALL_BUNDLE_LIB_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+  set(INSTALL_BUNDLE_BIN_DIR "${CMAKE_INSTALL_PREFIX}")
+else()
+  # System install: use FHS-compliant paths
+  set(INSTALL_BUNDLE_DATA_DIR "${CMAKE_INSTALL_PREFIX}/share/${BINARY_NAME}")
+  set(INSTALL_BUNDLE_LIB_DIR "${CMAKE_INSTALL_PREFIX}/lib/${BINARY_NAME}")
+  set(INSTALL_BUNDLE_BIN_DIR "${CMAKE_INSTALL_PREFIX}/bin")
+  
+  # Update RPATH for system installation to point to the system lib directory
+  set(CMAKE_INSTALL_RPATH "${INSTALL_BUNDLE_LIB_DIR}")
+endif()
 
-install(TARGETS ${BINARY_NAME} RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}"
+install(TARGETS ${BINARY_NAME} RUNTIME DESTINATION "${INSTALL_BUNDLE_BIN_DIR}"
   COMPONENT Runtime)
 
 install(FILES "${FLUTTER_ICU_DATA_FILE}" DESTINATION "${INSTALL_BUNDLE_DATA_DIR}"
