@@ -101,7 +101,11 @@ endif()
 
 # Determine if we're installing to a system location or creating a bundle.
 # System install uses FHS-compliant paths, bundle install uses a single directory.
-if(CMAKE_INSTALL_PREFIX STREQUAL BUILD_BUNDLE_DIR)
+# Normalize paths to ensure reliable comparison
+get_filename_component(NORMALIZED_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}" ABSOLUTE)
+get_filename_component(NORMALIZED_BUNDLE_DIR "${BUILD_BUNDLE_DIR}" ABSOLUTE)
+
+if(NORMALIZED_INSTALL_PREFIX STREQUAL NORMALIZED_BUNDLE_DIR)
   set(IS_BUNDLE_INSTALL TRUE)
   # Start with a clean build bundle directory every time for bundle installs.
   install(CODE "
@@ -124,7 +128,8 @@ else()
   set(INSTALL_BUNDLE_BIN_DIR "${CMAKE_INSTALL_PREFIX}/bin")
   
   # Update RPATH for system installation to point to the system lib directory
-  set(CMAKE_INSTALL_RPATH "${INSTALL_BUNDLE_LIB_DIR}")
+  set_target_properties(${BINARY_NAME} PROPERTIES
+    INSTALL_RPATH "${INSTALL_BUNDLE_LIB_DIR}")
 endif()
 
 install(TARGETS ${BINARY_NAME} RUNTIME DESTINATION "${INSTALL_BUNDLE_BIN_DIR}"
