@@ -128,7 +128,7 @@ else()
   set(INSTALL_BUNDLE_BIN_DIR "${CMAKE_INSTALL_PREFIX}/bin")
 
   # Update RPATH for system installation using relative path for portability
-  # Binary is in bin/, libraries are in lib/rpi5_car_radio/, so use ../lib/rpi5_car_radio
+  # Binary is in bin/, libraries are in lib/<binary_name>/, so use ../lib/<binary_name>
   set_target_properties(${BINARY_NAME} PROPERTIES
     INSTALL_RPATH "$ORIGIN/../lib/${BINARY_NAME}")
 endif()
