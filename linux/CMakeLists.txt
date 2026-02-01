@@ -126,10 +126,11 @@ else()
   set(INSTALL_BUNDLE_DATA_DIR "${CMAKE_INSTALL_PREFIX}/share/${BINARY_NAME}")
   set(INSTALL_BUNDLE_LIB_DIR "${CMAKE_INSTALL_PREFIX}/lib/${BINARY_NAME}")
   set(INSTALL_BUNDLE_BIN_DIR "${CMAKE_INSTALL_PREFIX}/bin")
-  
-  # Update RPATH for system installation to point to the system lib directory
+
+  # Update RPATH for system installation using relative path for portability
+  # Binary is in bin/, libraries are in lib/rpi5_car_radio/, so use ../lib/rpi5_car_radio
   set_target_properties(${BINARY_NAME} PROPERTIES
-    INSTALL_RPATH "${INSTALL_BUNDLE_LIB_DIR}")
+    INSTALL_RPATH "$ORIGIN/../lib/${BINARY_NAME}")
 endif()
 
 install(TARGETS ${BINARY_NAME} RUNTIME DESTINATION "${INSTALL_BUNDLE_BIN_DIR}"
