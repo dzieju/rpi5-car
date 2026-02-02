@@ -1,0 +1,31 @@
+---
+
+## Propozycje systemów do użytku w samochodzie z mini-PC/RPi
+
+### 1. OpenAuto Pro
+- **Opis**: Zaawansowana platforma multimedialna przypominająca Android Auto. Obsługuje dotykowe ekrany, DAC audio i Bluetooth. Łatwa w konfiguracji dla Raspberry Pi i małych komputerów PC.
+- **Link**: [OpenAuto Pro](https://bluewavestudio.io/shop/openauto-pro)
+- **Cena**: ~150-250 zł.
+
+### 2. Crankshaft
+- **Opis**: Darmowa, open-source'owa platforma dla Raspberry Pi z obsługą Android Auto.
+- **Link**: [Crankshaft](https://getcrankshaft.com/)
+- **Cena**: Bezpłatne.
+
+### 3. Automotive Grade Linux (AGL)
+- **Opis**: Profesjonalny system open-source używany w przemyśle motoryzacyjnym (np. Toyota). Bardziej złożona konfiguracja.
+- **Link**: [Automotive Grade Linux](https://www.automotivelinux.org/)
+
+### 4. FydeOS
+- **Opis**: System bazujący na Chromium OS z natywną obsługą aplikacji Android (Google Play). Przypomina Androida.
+- **Link**: [FydeOS](https://fydeos.io/download)
+
+### 5. Batocera Linux
+- **Opis**: System retro dla multimediów i gier, z opcjami konfiguracyjnymi dla dźwięku i aplikacji multimedialnych.
+- **Link**: [Batocera Linux](https://batocera.org/)
+
+### 6. Emteria.OS
+- **Opis**: Android zoptymalizowany pod urządzenia wbudowane.
+- **Link**: [Emteria.OS](https://emteria.com/)
+
+---
