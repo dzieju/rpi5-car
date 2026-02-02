@@ -135,15 +135,19 @@ else()
     INSTALL_RPATH "$ORIGIN/../lib/${BINARY_NAME}")
 endif()
 
+# Install the executable
 install(TARGETS ${BINARY_NAME} RUNTIME DESTINATION "${INSTALL_BUNDLE_BIN_DIR}"
   COMPONENT Runtime)
 
+# Install Flutter ICU data file (icudtl.dat) - required for internationalization
 install(FILES "${FLUTTER_ICU_DATA_FILE}" DESTINATION "${INSTALL_BUNDLE_DATA_DIR}"
   COMPONENT Runtime)
 
+# Install Flutter engine library (libflutter_linux_gtk.so) - core Flutter runtime
 install(FILES "${FLUTTER_LIBRARY}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
   COMPONENT Runtime)
 
+# Install plugin libraries - runtime dependencies for Flutter plugins
 foreach(bundled_library ${PLUGIN_BUNDLED_LIBRARIES})
   install(FILES "${bundled_library}"
     DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
@@ -151,21 +155,34 @@ foreach(bundled_library ${PLUGIN_BUNDLED_LIBRARIES})
 endforeach(bundled_library)
 
 # Copy the native assets provided by the build.dart from all packages.
+# These are ELF shared libraries from packages that provide native code.
 set(NATIVE_ASSETS_DIR "${PROJECT_BUILD_DIR}/native_assets/linux/")
-install(DIRECTORY "${NATIVE_ASSETS_DIR}"
-   DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
-   COMPONENT Runtime)
+if(EXISTS "${NATIVE_ASSETS_DIR}")
+  install(DIRECTORY "${NATIVE_ASSETS_DIR}"
+    DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
+    COMPONENT Runtime
+    FILES_MATCHING PATTERN "*.so*")
+endif()
 
-# Fully re-copy the assets directory on each build to avoid having stale files
-# from a previous install.
+# Fully re-copy the flutter_assets directory on each build to avoid having stale files
+# from a previous install. This directory contains all Flutter assets defined in pubspec.yaml.
 set(FLUTTER_ASSET_DIR_NAME "flutter_assets")
 install(CODE "
   file(REMOVE_RECURSE \"${INSTALL_BUNDLE_DATA_DIR}/${FLUTTER_ASSET_DIR_NAME}\")
   " COMPONENT Runtime)
-install(DIRECTORY "${PROJECT_BUILD_DIR}/${FLUTTER_ASSET_DIR_NAME}"
-  DESTINATION "${INSTALL_BUNDLE_DATA_DIR}" COMPONENT Runtime)
+# Ensure flutter_assets directory exists before attempting to install
+install(CODE "
+  if(EXISTS \"${PROJECT_BUILD_DIR}/${FLUTTER_ASSET_DIR_NAME}\")
+    file(INSTALL DESTINATION \"${INSTALL_BUNDLE_DATA_DIR}\"
+         TYPE DIRECTORY
+         FILES \"${PROJECT_BUILD_DIR}/${FLUTTER_ASSET_DIR_NAME}\")
+  else()
+    message(WARNING \"Flutter assets directory not found: ${PROJECT_BUILD_DIR}/${FLUTTER_ASSET_DIR_NAME}\")
+  endif()
+  " COMPONENT Runtime)
 
-# Install the AOT library on non-Debug builds only.
+# Install the AOT library (libapp.so) on non-Debug builds only.
+# This contains the compiled Dart code and is essential for Release/Profile builds.
 if(NOT CMAKE_BUILD_TYPE MATCHES "Debug")
   install(FILES "${AOT_LIBRARY}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
     COMPONENT Runtime)
